@@ -6,3 +6,4 @@ visual-studio/.vs/
 *.vcxproj.user
 .vscode/ipch/
 build/
+*.bat
