@@ -1,4 +1,4 @@
-# psp_spotify
+# PSPotify
 [WORK-IN-PROGRESS] Spotify for PSP
 
 # Thank to
