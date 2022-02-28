@@ -1,5 +1,5 @@
 # psp_spotify
-Spotify for PSP
+[WORK-IN-PROGRESS] Spotify for PSP
 
 # Thank to
 - https://github.com/xerpi/pspnetcat
