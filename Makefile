@@ -2,7 +2,7 @@ TARGET = pspnetcat
 OBJS   = main.o utils.o
 
 INCDIR   = 
-CFLAGS   = -G0 -Wall -O2 -Wno-unused-function
+CFLAGS   = -G0 -Wall -O2 -g -Wno-unused-function
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS  = $(CFLAGS)
 LIBS     = -lpspgu -lpspnet -lpspdisplay \

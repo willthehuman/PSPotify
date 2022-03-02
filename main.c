@@ -11,12 +11,13 @@
 #include <sys/socket.h>
 #include <string.h>
 #include "utils.h"
+use(run);
 
 PSP_MODULE_INFO("pspnetcat", PSP_MODULE_USER, 0, 1);
 PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER);
 
-#define PORT 4444
-#define IP "192.168.1.33"
+#define PORT 80
+#define IP "142.250.81.206"
 
 void cleanup();
 void net_apctl_event_handler(int oldState, int newState, int event, int error, void *pArg);
@@ -25,13 +26,13 @@ int main(int argc, char *argv[])
 {
     pspDebugScreenInit();
     SetupExitCallback();
-    
-    printf("pspnetcat | netcat client\n");
-    
+
+    printf("PSPotify | Spotify client\n");
+
     sceUtilityLoadNetModule(PSP_NET_MODULE_COMMON);
     sceUtilityLoadNetModule(PSP_NET_MODULE_INET);
-    
-    sceNetInit(64*1024, 32, 2*1024, 32, 2*1024);
+
+    sceNetInit(64 * 1024, 32, 2 * 1024, 32, 2 * 1024);
     sceNetInetInit();
     sceNetApctlInit(0x2000, 20);
     sceNetApctlAddHandler(net_apctl_event_handler, NULL);
@@ -44,30 +45,47 @@ int main(int argc, char *argv[])
         printf("PSP's IP: %s\n", psp_ip);
     else
         printf("Could not get PSP IP address\n");
-    
+
     int sock = sceNetInetSocket(AF_INET, SOCK_STREAM, 0);
-    
+
     struct sockaddr_in sa_dst;
     memset(&sa_dst, 0, sizeof(struct sockaddr_in));
     sa_dst.sin_family = AF_INET;
     sa_dst.sin_port = htons(PORT);
     inet_pton(AF_INET, IP, &sa_dst.sin_addr.s_addr);
+
+    sceNetInetConnect(sock, (struct sockaddr *)&sa_dst, sizeof(struct sockaddr_in));
     
-    sceNetInetConnect(sock, (struct sockaddr *) &sa_dst, sizeof(struct sockaddr_in));
-    
-    char str[] = "Hello from the PSP!\n";
-    sceNetInetSend(sock, str, sizeof(str), 0);
-    
+    char pszRequest[100]= {0};
+    char pszResourcePath[]="/";
+    char pszHostAddress[]="www.google.com";
+    sprintf(pszRequest, "GET /%s HTTP/1.1\r\nHost: %s\r\nContent-Type: text/plain\r\n\r\n", pszResourcePath, pszHostAddress);
+    printf("Created Get Request is below:\n\n\n");
+    printf("%s", pszRequest);
+
+    printf("Sending request...");
+    sceNetInetSend(sock, pszRequest, sizeof(pszRequest), 0);
+
     char buf[512];
-    while (1) {
+
+    printf("Waiting for reply...");
+    while (run)
+    {
         memset(buf, 0, sizeof(buf));
         sceNetInetRecv(sock, buf, 512, 0);
-        printf("Received: %s", buf);
+
+        if (buf[0] != '\0')
+        {
+            printf("Received: %s", buf);
+        }
+
         sceDisplayWaitVblankStart();
     }
-    
+
+    printf("out of run");
+
     sceNetInetClose(sock);
-    
+
     cleanup();
     sceKernelExitGame();
     return 0;
@@ -75,8 +93,9 @@ int main(int argc, char *argv[])
 
 void net_apctl_event_handler(int oldState, int newState, int event, int error, void *pArg)
 {
-    if (newState == PSP_NET_APCTL_STATE_DISCONNECTED) {
-        printf("Disconnected!\n");  
+    if (newState == PSP_NET_APCTL_STATE_DISCONNECTED)
+    {
+        printf("Disconnected!\n");
     }
 }
 

@@ -7,3 +7,5 @@ visual-studio/.vs/
 .vscode/ipch/
 build/
 *.bat
+
+spotify_api/
